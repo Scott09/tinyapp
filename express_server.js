@@ -21,7 +21,6 @@ const urlDatabase = {
 };
 
 
-
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -49,11 +48,19 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send(randomID(6));      
-     // Respond with 'Ok' (we will replace this)
+
+  let newShortURL = randomID(6);
+  urlDatabase[newShortURL] = req.body.longURL;
+  res.redirect('/urls');
+
 });
 
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
+});
+
+app.get("/u/:firstParam", (req, res) => {
+  const longURL = urlDatabase[req.params.firstParam];
+  res.redirect(longURL);
 });
