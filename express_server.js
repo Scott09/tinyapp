@@ -47,7 +47,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  // console.log(req.body);  // Log the POST request body to the console
 
   let newShortURL = randomID(6);
   urlDatabase[newShortURL] = req.body.longURL;
@@ -61,6 +61,11 @@ app.post("/urls/:shortURL/delete", (request, response) => {
 
 app.post("/urls/:shortURL/update", (request, response) => {
   response.redirect(`/urls/` + request.params.shortURL);
+});
+
+app.post("/urls/:shortURL/newLong", (request, response) => {
+  urlDatabase[request.params.shortURL] = request.body.newurl;
+  response.redirect("/urls");
 });
 
 app.get("/urls/:id", (req, res) => {
