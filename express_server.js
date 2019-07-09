@@ -52,7 +52,6 @@ app.post("/urls", (req, res) => {
   let newShortURL = randomID(6);
   urlDatabase[newShortURL] = req.body.longURL;
   res.redirect('/urls');
-
 });
 
 app.get("/urls/:id", (req, res) => {
