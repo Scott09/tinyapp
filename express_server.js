@@ -80,7 +80,7 @@ app.post("/login", (request, response) => {
 });
 
 app.post("/logout", (request, response) => {
-  response.clearCookie('username');
+  response.clearCookie("username");
   response.redirect("/urls");
 });
 
