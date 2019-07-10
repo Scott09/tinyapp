@@ -64,6 +64,9 @@ app.get("/login", (request, response) => {
 app.get("/urls/new", (request, response) => {
   let templateVars = { urls: urlDatabase , 
     users: users, user_id: request.cookies.user_id};
+    if (!request.cookies.user_id) {
+      response.redirect("/urls");
+    }
   response.render("urls_new", templateVars);
 });
 
@@ -82,7 +85,6 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/registration", (request, response) => {
-
   let newRandomID = randomID(10);
   for (const key in users) {
     if (users[key].email === request.body.email){
