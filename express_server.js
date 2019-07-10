@@ -24,6 +24,15 @@ const urlDatabase = {
 };
 
 
+const users = {
+  "testuserid" : {
+    id: 123,
+    email: "testuser@test.com",
+    password: "password123"
+  }
+};
+
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -42,14 +51,26 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (request, response) => {
   let templateVars = { urls: urlDatabase , 
-    username: request.cookies["username"]};
+    "users": users, user_id: request.cookies.user_id};
   response.render("urls_index", templateVars);
 });
 
-app.get("/urls/new", (req, res) => {
+app.get("/login", (request, response) => {
   let templateVars = { urls: urlDatabase , 
-    username: req.cookies["username"]}
-  res.render("urls_new", templateVars);
+    "users": users, user_id: request.cookies.user_id};
+ response.render("login", templateVars);
+});
+
+app.get("/urls/new", (request, response) => {
+  let templateVars = { urls: urlDatabase , 
+    users: users, user_id: request.cookies.user_id};
+  response.render("urls_new", templateVars);
+});
+
+app.get("/registration", (request, response) => {
+  let templateVars = { urls: urlDatabase , 
+    users: users, user_id: request.cookies.user_id};
+  response.render("registration", templateVars);  
 });
 
 app.post("/urls", (req, res) => {
@@ -60,6 +81,33 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls');
 });
 
+app.post("/registration", (request, response) => {
+
+  let newRandomID = randomID(10);
+  for (const key in users) {
+    if (users[key].email === request.body.email){
+      response.send("can't use that email");
+      return;
+    }
+  }
+    users[newRandomID] = {};
+    users[newRandomID].id = newRandomID;
+    users[newRandomID].email = request.body.email;
+    users[newRandomID].password = request.body.password;
+    response.redirect("/urls");
+});
+
+app.post("/login", (request, response) => {
+  for (const key in users) {
+    if (users[key].email === request.body.email && users[key].password === request.body.password) {
+      response.cookie('user_id', key);
+      response.redirect("/urls");
+      return;
+    } 
+  }
+  response.status(403).send("Invalid email or password");
+});
+  
 app.post("/urls/:shortURL/delete", (request, response) => {
   delete urlDatabase[request.params.shortURL];
   response.redirect('/urls');
@@ -76,17 +124,17 @@ app.post("/urls/:shortURL/newLong", (request, response) => {
 });
 
 app.post("/login", (request, response) => {
-  response.cookie('username', request.body.username);
+  request.cookies.user_id.verified = true;
   response.redirect("/urls");
 });
 
 app.post("/logout", (request, response) => {
-  response.clearCookie("username");
+  response.clearCookie("user_id");
   response.redirect("/urls");
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = { shortURL: request.params.id, longURL: urlDatabase[request.params.id], username: request.cookies["username"]};
+  let templateVars = { shortURL: request.params.id, longURL: urlDatabase[request.params.id], users: users, user_id: request.cookies.user_id};
   response.render("urls_show", templateVars);
 });
 
