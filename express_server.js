@@ -5,6 +5,9 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+var cookieParser = require('cookie-parser')
+app.use(cookieParser())
+
 const randomID = (length) => {  
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -37,13 +40,16 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 }); 
 
-app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+app.get("/urls", (request, response) => {
+  let templateVars = { urls: urlDatabase , 
+    username: request.cookies["username"]};
+  response.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { urls: urlDatabase , 
+    username: req.cookies["username"]}
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -65,6 +71,16 @@ app.post("/urls/:shortURL/update", (request, response) => {
 
 app.post("/urls/:shortURL/newLong", (request, response) => {
   urlDatabase[request.params.shortURL] = request.body.newurl;
+  response.redirect("/urls");
+});
+
+app.post("/login", (request, response) => {
+  response.cookie('username', request.body.username);
+  response.redirect("/urls");
+});
+
+app.post("/logout", (request, response) => {
+  response.clearCookie('username');
   response.redirect("/urls");
 });
 
