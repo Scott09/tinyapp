@@ -4,6 +4,8 @@ const PORT = 8080;
 app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
+const bcrypt = require('bcrypt');
+
 
 var cookieParser = require('cookie-parser')
 app.use(cookieParser())
@@ -16,6 +18,15 @@ const randomID = (length) => {
   }
   return text;
 }
+
+const getUserByEmail = (email, users) => {
+  for (const key in users) {
+    if (users[key].email === email) {
+      return true;
+    }
+  }
+  return false;
+};
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
@@ -92,22 +103,24 @@ app.post("/urls", (request, response) => {
 
 app.post("/registration", (request, response) => {
   let newRandomID = randomID(10);
-  for (const key in users) {
-    if (users[key].email === request.body.email) {
+  
+    if (getUserByEmail(request.body.email, users)) {
       response.send("can't use that email");
       return;
-    }
   }
+  const password = request.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   users[newRandomID] = {};
   users[newRandomID].id = newRandomID;
   users[newRandomID].email = request.body.email;
-  users[newRandomID].password = request.body.password;
+  users[newRandomID].password = hashedPassword;
   response.redirect("/urls");
 });
 
 app.post("/login", (request, response) => {
   for (const key in users) {
-    if (users[key].email === request.body.email && users[key].password === request.body.password) {
+    if (users[key].email === request.body.email && bcrypt.compareSync(request.body.password ,users[key].password)) {
       response.cookie('user_id', key);
       response.redirect("/urls");
       return;
@@ -156,5 +169,7 @@ app.get("/u/:firstParam", (req, res) => {
     const longURL = urlDatabase[req.params.firstParam].longURL;
     res.redirect(longURL);
   }
-  
 });
+
+
+
