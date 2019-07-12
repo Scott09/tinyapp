@@ -19,9 +19,13 @@
        <tr><h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p></tr> 
       </div>
+      <% for(let url in urls) { %>
+        <% if (user_id === urls[url].userID) { %>
       <div class="card-body">
         <tr><label>New URL:</label><form method ="POST" action="/urls/<%= shortURL %>/newLong"><input type="text" name="newurl"><button type="submit" class="btn btn-outline-danger btn-lg">Submit</button></form></tr> 
         </div>
+        <% } %>
+    <% } %>
     <div class="card-footer text-muted"></div>
   </div>
   <!-- Bootstrap JS -->

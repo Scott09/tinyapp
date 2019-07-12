@@ -10,18 +10,10 @@ const getUserByEmail = require('./helpers');
 
 app.set('trust proxy', 1)
 
-
-// var cookieParser = require('cookie-parser');
-// app.use(cookieParser());
-
-
 app.use(cookieSession({
   name: "session",
   keys: ['key1', 'key2']
 }));
-
-
-
 
 const randomID = (length) => {
   var text = "";
@@ -166,7 +158,7 @@ app.post("/logout", (request, response) => {
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = { shortURL: request.params.id, longURL: urlDatabase[request.params.id].longURL, users: users, user_id: request.session.user_id };
+  let templateVars = { urls: urlDatabase, shortURL: request.params.id, longURL: urlDatabase[request.params.id].longURL, users: users, user_id: request.session.user_id };
   response.render("urls_show", templateVars);
 });
 

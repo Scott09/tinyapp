@@ -21,6 +21,11 @@ describe('getUserByEmail', function() {
     const expectedOutput = "userRandomID";
     assert.equal(user, expectedOutput);
   });
+  it('should return false when given invalid email', function() {
+    const user = getUserByEmail("notvalid@gmail.com", testUsers)
+    const expectedOutput = false;
+    assert.equal(user, expectedOutput);
+  });
 });
 
 
