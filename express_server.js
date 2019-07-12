@@ -33,8 +33,15 @@ const users = {
 
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
+app.get("/", (request, response) => {
+  if (request.session.user_id) { 
+    response.redirect("/urls");
+    return;
+  } else {
+    response.redirect("/login");
+    return;
+  }
+  
 });
 
 app.listen(PORT, () => {
@@ -75,7 +82,8 @@ app.get("/urls/new", (request, response) => {
     users: users, user_id: request.session.user_id
   };
   if (!request.session.user_id) {
-    response.redirect("/urls");
+    response.redirect("/login");
+    return;
   }
   response.render("urls_new", templateVars);
 });
@@ -166,5 +174,8 @@ app.get("/u/:firstParam", (req, res) => {
   if (urlDatabase[req.params.firstParam]) {
     const longURL = urlDatabase[req.params.firstParam].longURL;
     res.redirect(longURL);
+    return;
+  } else {
+    res.send("This is not a valid link. Please go back");
   }
 });
